@@ -13,9 +13,9 @@
 // }
 // console.log(fullName);
 
-let string = 'jon';
-let string_1 = [...string];
-console.log(string_1);
+let number = 123;
+let number_1 = [...number];
+console.log(number_1);
 // let arr = ['a', 'b', 'c'];
 // let arr_1 = [...arr];
 // arr_1[2] = 'd';
