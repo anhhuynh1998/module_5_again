@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Modal } from "bootstrap";
 import { useForm } from "react-hook-form";
 import { v4 as uuidv4 } from 'uuid';
+import ModalCreate from './ModalCreate';
 
 const IndexComponent = () => {
     const [customerList, setCustomerList] = useState([
@@ -15,22 +16,35 @@ const IndexComponent = () => {
             gender: 'male',
             city: ' hà nội'
         },
+        {
+            id: uuidv4().slice(0, 5),
+            name: 'NVb',
+            email: 'nvb@cc.oo',
+            phone: '771233',
+            address: 'cháy chợ',
+            gender: 'Female',
+            city: ' hà nội'
+        },
 
     ])
 
-    const { register, handleSubmit, reset } = useForm();
-    const [showModal, setShowModal] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState({});
+    const { handleSubmit, reset } = useForm();
+
 
     const handleEdit = (id) => {
         console.log(id);
     }
     const handleDelete = (id) => {
-        alert("delete " + id)
-        const list = customerList.filter((item) => item.id != id)
-        setCustomerList(list)
-    }
+        alert("delete " + id);
+        const updatedList = [];
+        for (let i = 0; i < customerList.length; i++) {
+            const item = customerList[i];
+            if (item.id !== id) {
+                updatedList.push(item);
+            }
+        }
+        setCustomerList(updatedList);
+    };
     const handleCreate = (data) => {
         console.log(data);
         const customer = {
@@ -76,11 +90,17 @@ const IndexComponent = () => {
                                 <td>{item.gender}</td>
                                 <td>{item.city}</td>
                                 <td>{item.address}</td>
-                                <td onClick={() => handleEdit(item.id)}>
-                                    <i className="fa fa-pen btn btn-primary" />
+                                <td>
+                                    <button data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                        onClick={() => handleEdit(item.id)}
+                                    >
+                                        <i className="fa fa-pen btn btn-primary" />
+                                    </button>
                                 </td>
-                                <td onClick={() => handleDelete(item.id)}>
-                                    <i className="fa fa-trash btn btn-danger" />
+                                <td>
+                                    <button onClick={() => handleDelete(item.id)}>
+                                        <i className="fa fa-trash btn btn-danger" />
+                                    </button>
                                 </td>
                             </tr>
                         ))
@@ -88,109 +108,12 @@ const IndexComponent = () => {
 
                 </tbody>
             </table>
-            <form onSubmit={handleSubmit(handleCreate)}>
-                <div
-                    className="modal fade"
-                    id="exampleModal"
-                    tabIndex={-1}
-                    aria-labelledby="exampleModalLabel"
-                    aria-hidden="true"
-                >
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title" id="exampleModalLabel">
-                                    Modal title
-                                </h5>
-                            </div>
-                            <div className="row ms-3 m-2 ">
-                                <div className="col-lg-6">
-                                    <label htmlFor="">FullName</label>
-                                    <input type="text" name="" id=""
-                                        {...register('fullname')} />
-                                </div>
-                                <div className="col-lg-6">
-                                    <label htmlFor="">Email</label>
-                                    <input type="email" name="" id=""
-                                        {...register('email')} />
-                                </div>
-                            </div>
-                            <div className="row ms-3 m-2">
-                                <div className="col-lg-6">
-                                    <label htmlFor="">Phone</label>
-                                    <input type="number" name="" id=""
-                                        {...register('phone')} />
-                                </div>
-                                <div className="col-lg-6">
-                                    <label htmlFor="">Address</label>
-                                    <input type="text" name="" id=""
-                                        {...register('address')} />
-                                </div>
-                            </div>
-                            <div className="row ms-3 ">
-                                <div className="col-lg-6">
-                                    <label htmlFor="">City</label>
-                                    <select
-                                        className="form-select"
-                                        multiple=""
-                                        aria-label="multiple select example"
-                                        {...register('city')}
-                                    >
-                                        <option defaultValue="">-Vui Lòng Chọn-</option>
-                                        <option value='Hà Nội'>Hà Nội</option>
-                                        <option value='TP HCM'>TP HCM</option>
-                                        <option value='Huế'>Huế</option>
-                                        <option value='Huế'>Hải Phòng</option>
-                                        <option value='Huế'>Đà Nẵng</option>
-                                    </select>
-                                </div>
-                                <div className="col-lg-6 mb-5">
-                                    <label htmlFor="" className="">Gender
-                                        <div className="d-flex">
-                                            <div className="form-check me-3">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="radio"
-                                                    name="flexRadioDefault"
-                                                    id="flexRadioDefault1"
-                                                    value="male"
-                                                    {...register('gender')}
-                                                />
-                                                <label className="form-check-label" htmlFor="flexRadioDefault1">Male</label>
-                                            </div>
-                                            <div className="form-check">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="radio"
-                                                    name="flexRadioDefault"
-                                                    id="flexRadioDefault2"
-                                                    defaultChecked=""
-                                                    value="female"
-                                                    {...register("gender")}
-                                                />
-                                                <label className="form-check-label" htmlFor="flexRadioDefault2"> Female</label>
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
 
-                            <div className="modal-footer">
-                                <button
-                                    type="button"
-                                    className="btn btn-secondary"
-                                    data-bs-dismiss="modal"
-                                >
-                                    Close
-                                </button>
-                                <button className="btn btn-primary">Save changes</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
+            <ModalCreate onSubmit={handleSubmit(handleCreate)} />
+
 
         </div>
+
     )
 };
 

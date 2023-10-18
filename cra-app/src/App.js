@@ -1,17 +1,16 @@
 
 import './App.css';
 import React from 'react';
-// import Count from './conponents/Count';
-import TaskApp from './conponents/TaskApp';
-// import UseEffectWithDependencies from './conponents/UseEffectWithDependencies';
-import IndexComponent from './task/TaskComponent/IndexComponent';
+
+import TodoApp from './useReducerComponet/TodoApp';
 
 function App() {
   return (
     <div>
-      {/* <UseEffectWithDependencies /> */}
-      <IndexComponent />
-      {/* <TaskApp /> */}
+
+      {/* <IndexComponent /> */}
+
+      <TodoApp />
     </div>
   );
 }

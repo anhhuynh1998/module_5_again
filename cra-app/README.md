@@ -49,13 +49,60 @@ const value = useContext(SomeContext)
 # Demo : 
 ##### 
 
-##### Tôi tạo 1 file có tên là MyApp.jsx và đưa vào đoạn code như sau : 
+##### 1. Create context, tạo 1 file có tên là ThemeContext: 
+- import createContext từ thư viện react
+- làm như thế này ta có thể dễ quản lý những thứ này hơn và có thể
+- nhưng như thế này là chưa đủ vì cái thẻ vẫn chưa ôm được dữ liệu bên trong nó và trong JS ta có 1 property(thuộc tính) là children để có thể đại diện cho nội dung ta muốn truyền vào 
 ```javascript
-import {createContext,useContext,useState} from 'react'
+import { useState, createContext } from 'react'
 
-
-
+const ThemeContext = createContext();
+// tạo 1 function tên ThemeProvider đi chẳng hạn
+function ThemeProvider({ children }) {
+    // tạo 1 useState để quản lý trạng thái khi ta bật tắt tonggle
+    const [theme, setTheme] = useState('dark')
+    // tạo 1 hàm để khi ta onClick thì nó có thể thay đổi trạng thái của theme
+    const ButtonToggleTheme = () => {
+        setTheme(theme === 'dark' ? 'light' : 'dark')
+    }
+    return (
+        // provider dùng để bọc lại các thành phần con mà bạn muốn chia sẽ 
+        <ThemeContext.Provider value = {theme}>
+            { children }
+        </ThemeContext.Provider>
+    ) 
+}
+export {ThemeContext , ThemeProvider}
 ```
+##### 2.Consumer, tạo 1 file là Content để lấy dữ liệu mà provider nó cung cấp  :
+- Consumer là thành phần sử dụng dữ liệu được cung cấp bởi Provider. Nó nhận vào một hàm như children và truyền giá trị từ Provider vào hàm đó. Khi giá trị trong Provider thay đổi, Consumer sẽ tự động cập nhật lại để hiển thị dữ liệu mới.
+```javascript
+// imprort useContext từ thư viện của react
+import { useContext } form 'react'
+// import ThemeContext từ file ThemeContext
+import { ThemeContext } form './ThemeContext'
+
+function Content() {
+    // khi ta sử dụng useContext ở đây thì ThemeContext.Provider có value là gì thì khi ta dùng nó ở đây thì nó có dữ liệu là cái đó
+    const theme = useContext(ThemeContext);
+
+    return (
+        <p className = { theme }>
+            Chào Cả Nhà Mình Nhá !!!
+        </p>
+    )
+}
+```
+#####3. Tại file App.css ta css nhẹ để cho nó có chút màu sắc
+```css
+.dark {
+    color : #fff;
+    backgound-color : #ccc
+}
+```
+- ở file App.js ta import file css này vào
+#### Như vậy là chúng ta đã gần như hoàn thành về phần này bây giờ chỉ cần import chúng đúng chỗ nữa là hoàn thành.
+
 # Từ useState đến useReducer
 như ta đã biết useState có thể quản lý những trạng thái và thay đổi nó và các chức năng khác của react(lifecycle,side effect,...)
 ### 1 ví dụ nhỏ về useState
@@ -81,71 +128,134 @@ function Example() {
 ##### Vậy useReducer là gì mà nó có thể quản lý và tổ chức state tốt hơn useState ??
 ### Vậy thì sau đây mình xin giới thiệu đôi chút về useReducer !
 # useReducer 
-- useReducer là gì ?
-- 
-## Available Scripts
+### useReducer là gì ?
+- Thực chất useReducer là 1 phiên bản nâng cao của useState dùng trong trường hợp mà state của component phức tạp, có nhiều action làm thay đổi state đó
+- Thay vì các bạn dùng nhiều useState hoặc useState với value là nested object/array và viết nhiều function để thay đổi state thì bây giờ các bạn có thể tổ chức state và các action làm thay đổi state đó 1 cách logic nhờ useReducer.
 
-In the project directory, you can run:
+```javascript
+const [state, dispatch] = useReducer(reducer, initialArg, init?)
+```
+- state : là trạng thái hiện tại của component
+- dispatch : là 1 hàm được sử dụng để gửi hành động tới reducer để cập nhật trạng thái.Khi dispatch được gọi với 1 hành động, React nó sẽ gọi hàm reducer với trạng thái hiện tại và hành động đó để tính toán trạng thái mới,sau đó nó cập nhật state với trạng thái mới.
+- reducer : là 1 hàm dùng để sử lý các thay đổi của trạng thái. Hàm này nhận vào 2 tham số (state, action) được thực hiện. Dựa trên hành động mà bạn truyền vào  hàm reducer sẽ trả về trạng thái mới.
+ví dụ : 
+```javascript
+const reducer = (state , action) => {
+    switch (action.type) {
+        case 'INCREMENT':
+            return { count: state.count + 1 };
+        case 'DECREMENT':
+            return { count: state.count - 1 };
+        default:
+            return state;
+  }
+}
+```
+- initialArg : là trạng thái ban đầu (init state ) của component.Đây có thể là giá trị bất kỳ.
+- init? : init là một hàm tùy chọn được sử dụng để tạo trạng thái ban đầu nếu bạn cần thực hiện một loạt tính toán phức tạp hoặc không muốn tính toán trạng thái ban đầu. Hàm init nhận vào initialArg và trả về trạng thái ban đầu. Nếu bạn không cung cấp tham số này, initialArg sẽ được sử dụng trực tiếp làm trạng thái ban đầu. 
+ # Demo : 
+ ### Ở đây mình tạo 1 file tên là todoApp
+ #### có 4 phần cần phải làm việc đó là :
+ ##### 1. init state, xác định trạng thái ban đầu của nó  
+ ```javascript
+const initState = {
+    job: '',
+    jobs: []
+};
+ ```
+##### 2. action, xử lý action khi reducer được gọi
+```javascript
+const SET_JOB = 'set_job';
+const ADD_JOB = 'add_job';
+const DELETE_JOB = 'delete_job';
 
-### `npm start`
+const setJob = (payload) => {
+    return {
+        type: SET_JOB,
+        payload
+    }
+}
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+const addJob = (payload) => {
+    return {
+        type: ADD_JOB,
+        payload
+    }
+}
+const deleteJob = (payload) => {
+    return {
+        type: DELETE_JOB,
+        payload
+    }
+}
+```
+##### 3. reducer, hàm sử lý khi các thay đổi của trạng thái :
+```javascript
+const reducer = (state, action) => {
+    switch (action.type) {
+        case SET_JOB:
+            return {
+                ...state,
+                job: action.payload
+            };
+        case ADD_JOB:
+            return {
+                ...state,
+                jobs: [...state.jobs, action.payload]
+            }
+        case DELETE_JOB:
+            const newJob = [...state.jobs]
+            newJob.splice(action.payload, 1)
+            return {
+                ...state,
+                jobs: newJob
+            }
+        default:
+            throw new Error('Invalid action.', action.type)
+    }
+}
+```
+##### 4. dispatch ,hàm được sử dụng để gửi hành động tới reducer để cập nhật trạng thái :
+```javascript
+const TodoApp = () => {
+    const [state, dispatch] = useReducer(reducer, initState)
+    const { job, jobs } = state
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+    const inputRef = useRef()
 
-### `npm test`
+    const handleSubmit = () => {
+        dispatch(addJob(job))
+        dispatch(setJob(''))
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+        inputRef.current.focus()
+    }
+    return (
+        <div style={{ padding: '0 20px' }}>
+            <h3>TodoApp</h3>
+            <input
+                ref={inputRef}
+                value={job}
+                placeholder=' enter todo'
+                onChange={e => {
+                    dispatch(setJob(e.target.value))
+                }}
+            />
+            <button onClick={handleSubmit}>
+                Add
+            </button>
+            <ul>
+                {jobs.map((job, index) => (
+                    <li key={index}>{job}
+                        <button onClick={() => dispatch(deleteJob(index))}>
+                            Delete
+                        </button>
+                    </li>
+                ))}
 
-### `npm run build`
+            </ul>
+        </div>
+    )
+}
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```
+# Cám ơn tất cả mọi người đã quan tâm và theo dõi bài thuyết trình của mình !
